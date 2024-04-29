@@ -158,6 +158,7 @@
 #'   numeric value (\code{"numeric"}), as 'stars' (asterisks) only (\code{"stars"}),
 #'   or scientific (\code{"scientific"}). Scientific and numeric style can be
 #'   combined with "stars", e.g. \code{"numeric_stars"}
+#' @param p.value Numeric, indicating the level at which to bold print a p-value
 #' @param CSS A \code{\link{list}} with user-defined style-sheet-definitions,
 #'    according to the \href{https://www.w3.org/Style/CSS/}{official CSS syntax}.
 #'    See 'Details' or \href{https://strengejacke.github.io/sjPlot/articles/table_css.html}{this package-vignette}.
@@ -328,6 +329,7 @@ tab_model <- function(
   p.style = c("numeric", "stars", "numeric_stars", "scientific", "scientific_stars"),
   p.threshold = c(0.05, 0.01, 0.001),
   p.adjust = NULL,
+  p.value = 0.05,
 
   case = "parsed",
   auto.label = TRUE,
@@ -536,7 +538,7 @@ tab_model <- function(
           drop = drop,
           std.response = std.response
         ) %>%
-          format_p_values(p.style, digits.p, emph.p, p.threshold) %>%
+          format_p_values(p.style, digits.p, emph.p, p.threshold, p.value) %>%
           sjmisc::var_rename(
             estimate = "std.estimate",
             std.error = "std.se",
@@ -578,7 +580,7 @@ tab_model <- function(
       }
 
       # format p values for unstandardized model
-      dat <- format_p_values(dat, p.style, digits.p, emph.p, p.threshold)
+      dat <- format_p_values(dat, p.style, digits.p, emph.p, p.threshold, p.value)
 
       # add asterisks to estimates ----
 
@@ -1423,7 +1425,7 @@ prepare.labels <- function(x, grp, categorical, models) {
   x
 }
 
-format_p_values <- function(dat, p.style, digits.p, emph.p, p.threshold) {
+format_p_values <- function(dat, p.style, digits.p, emph.p, p.threshold, p.value) {
   # get stars and significance at alpha = 0.05 ----
 
   if (!"p.value" %in% names(dat)) {
@@ -1433,7 +1435,7 @@ format_p_values <- function(dat, p.style, digits.p, emph.p, p.threshold) {
   dat <- dat %>%
     dplyr::mutate(
     p.stars = get_p_stars(.data$p.value, p.threshold),
-    p.sig = .data$p.value < .05
+    p.sig = .data$p.value < p.value
   )
 
   # scientific notation ----
