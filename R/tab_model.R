@@ -1425,7 +1425,7 @@ prepare.labels <- function(x, grp, categorical, models) {
   x
 }
 
-format_p_values <- function(dat, p.style, digits.p, emph.p, p.threshold, p.value) {
+format_p_values <- function(dat, p.style, digits.p, emph.p, p.threshold, p.val) {
   # get stars and significance at alpha = 0.05 ----
 
   if (!"p.value" %in% names(dat)) {
@@ -1435,7 +1435,7 @@ format_p_values <- function(dat, p.style, digits.p, emph.p, p.threshold, p.value
   dat <- dat %>%
     dplyr::mutate(
     p.stars = get_p_stars(.data$p.value, p.threshold),
-    p.sig = .data$p.value < p.value
+    p.sig = .data$p.value < p.val
   )
 
   # scientific notation ----
